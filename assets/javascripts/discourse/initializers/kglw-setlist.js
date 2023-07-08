@@ -53,6 +53,8 @@ export function initializeSetlistCode(api) {
 export default {
   name: PLUGIN_NAME,
   initialize() {
-    withPluginApi('1.3.0', initializeSetlistCode);
+    const siteSettings = container.lookup('site-settings:main');
+    if (siteSettings.kglwSetlist_enabled)
+      withPluginApi('1.3.0', initializeSetlistCode);
   },
 };
