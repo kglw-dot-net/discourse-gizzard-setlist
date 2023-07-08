@@ -17,9 +17,10 @@ async function doTheSetlist(setlistElement) {
 
 function renderSetlist(cookedElement) {
   cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`).forEach((s) => {
-    doTheSetlist(s);
+    global.console.log('renderSetlist', s);
     s.classList.remove(HTML_CLASS_NAME);
     s.classList.add('spoiled');
+    doTheSetlist(s);
   });
 }
 
