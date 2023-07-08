@@ -40,7 +40,7 @@ export function initializeSetlistCode(api) {
     actions: {
       insertSetlist() { // matches action prop passed to addToolbarPopupMenuOptionsCallback
         // TODO check date format...
-        global.console.log('insertSetlist...');
+        console.log('insertSetlist...', this, ...arguments);
         this.get('toolbarEvent').applySurround(
           '[setlist]',
           '[/setlist]',
