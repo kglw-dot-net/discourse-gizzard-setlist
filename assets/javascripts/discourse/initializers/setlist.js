@@ -2,8 +2,24 @@ import { withPluginApi } from 'discourse/lib/plugin-api';
 import ComposerController from 'discourse/controllers/composer';
 import { addTagDecorateCallback } from 'discourse/lib/to-markdown';
 
-function renderSetlist(...args) {
-  console.log('we did it', ...args);
+const HTML_CLASS_NAME = 'kglwSetlist';
+// const HTML_CLASS_NAME_PROCESSED = 'kglwSetlistProcessed';
+
+function doTheSetlist(setlistElement) {
+  console.log('do the setlist!', fetch);
+  const date = setlistElement.innerHTML;
+  const result = (await fetch(`https://kglw.net/api/v1/setlists/showdate/${date}.json`)).json()
+  global.console.log({result});
+  const showData = result.data.map(song => `${song.songname}${song.transition}`).join('')
+  setlistElement.innerHTML = showData
+}
+
+function renderSetlist(cookedElement) {
+  cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`).forEach((s) => {
+    doTheSetlist(s);
+    s.classList.remove(HTML_CLASS_NAME);
+    s.classList.add('spoiled');
+  });
 }
 
 export function initializeSetlistCode(api) {
@@ -11,10 +27,8 @@ export function initializeSetlistCode(api) {
   api.addToolbarPopupMenuOptionsCallback(() => ({ action: 'insertSetlist', icon: 'list', label: 'setlist.title' }));
   ComposerController.reopen({
     actions: {
-      insertSetlist() {
-        this.get('toolbarEvent').applySurround(
-          '[setlist]',
-          '[/setlist]',
+      insertSetlist() { // matches action prop passed to addToolbarPopupMenuOptionsCallback
+        this.get('toolbarEvent').applySurround('[setlist]', '[/setlist]',
           'setlist_text',
           { multiline: false, useBlockMode: false }
         );
@@ -23,7 +37,8 @@ export function initializeSetlistCode(api) {
   });
 
   addTagDecorateCallback(function () {
-    if (this.element.attributes.class === 'setlist') {
+    global.console.log('aTDC', this.element);
+    if (this.element.attributes.class === 'spoiled') {
       this.prefix = '[setlist]';
       this.suffix = '[/setlist]';
     }
@@ -31,13 +46,12 @@ export function initializeSetlistCode(api) {
 
   // decorate "cooked" content (after it's been rendered)
   // https://github.com/discourse/discourse/blob/1526d1f97d46/app/assets/javascripts/discourse/app/lib/plugin-api.js#L369
-  api.decorateCookedElement(renderSetlist, { id: 'kglw-setlist' });
+  api.decorateCookedElement(renderSetlist, { id: 'kglw-setlist' }); // what's this ID for?
 }
 
 export default {
   name: 'setlist',
   initialize() {
-    console.log('lets goooooooo', fetch);
     withPluginApi('1.3.0', initializeSetlistCode);
   },
 };
