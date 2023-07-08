@@ -1,6 +1,6 @@
 import { withPluginApi } from 'discourse/lib/plugin-api';
 import ComposerController from 'discourse/controllers/composer';
-import { addTagDecorateCallback } from 'discourse/lib/to-markdown';
+import { addBlockDecorateCallback } from 'discourse/lib/to-markdown';
 
 const PLUGIN_NAME = 'setlist';
 const HTML_CLASS_NAME = 'kglwSetlist';
