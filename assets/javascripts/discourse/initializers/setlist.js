@@ -2,12 +2,14 @@ import { withPluginApi } from 'discourse/lib/plugin-api';
 import ComposerController from 'discourse/controllers/composer';
 import { addTagDecorateCallback } from 'discourse/lib/to-markdown';
 
-const PLUGIN_NAME = 'kglw-setlist';
+const PLUGIN_NAME = 'setlist';
 const HTML_CLASS_NAME = 'kglwSetlist';
 // const HTML_CLASS_NAME_PROCESSED = 'kglwSetlistProcessed';
 
 async function doTheSetlist(setlistElement) {
   console.log('do the setlist!', fetch);
+  if (!fetch)
+    return;
   const date = setlistElement.innerHTML;
   const result = (await fetch(`https://kglw.net/api/v1/setlists/showdate/${date}.json`)).json()
   global.console.log({result});
