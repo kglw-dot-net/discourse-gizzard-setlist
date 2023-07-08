@@ -37,7 +37,7 @@ export function initializeSetlistCode(api) {
           'setlist_text', // locale string js.composer.setlist_text
           { multiline: false, useBlockMode: false }
         );
-        log('insertSetlist...', this, ...arguments);
+        log('insertSetlist...', this, ...arguments); // this is okay... but it doesn't get cooked??
       },
     },
   });
@@ -64,6 +64,7 @@ export function initializeSetlistCode(api) {
   // decorate "cooked" content (after it's been rendered)
   // https://github.com/discourse/discourse/blob/1526d1f97d46/app/assets/javascripts/discourse/app/lib/plugin-api.js#L369
   api.decorateCookedElement(function(cookedElement) {
+    log('decorateCookedElement...', cookedElement);
     cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`).forEach((elem) => {
       log('decorateCookedElement...', elem);
       elem.addEventListener('click', () => {
@@ -83,8 +84,8 @@ export function initializeSetlistCode(api) {
 export default {
   name: PLUGIN_NAME,
   initialize(container) {
-    const siteSettings = container.lookup('site-settings:main');
-    if (siteSettings.kglwSetlist_enabled)
+    const {kglwSetlist_enabled} = container.lookup('site-settings:main');
+    if (kglwSetlist_enabled)
       withPluginApi('1.3.0', initializeSetlistCode);
   },
 };
