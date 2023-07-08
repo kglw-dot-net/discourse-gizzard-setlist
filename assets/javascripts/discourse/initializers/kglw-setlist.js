@@ -6,7 +6,7 @@ const PLUGIN_NAME = 'kglw-setlist';
 const HTML_CLASS_NAME = 'kglwSetlist';
 // const HTML_CLASS_NAME_PROCESSED = 'kglwSetlistProcessed';
 
-function doTheSetlist(setlistElement) {
+async function doTheSetlist(setlistElement) {
   console.log('do the setlist!', fetch);
   const date = setlistElement.innerHTML;
   const result = (await fetch(`https://kglw.net/api/v1/setlists/showdate/${date}.json`)).json()
