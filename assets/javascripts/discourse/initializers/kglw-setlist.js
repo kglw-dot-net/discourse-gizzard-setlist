@@ -2,6 +2,7 @@ import { withPluginApi } from 'discourse/lib/plugin-api';
 import ComposerController from 'discourse/controllers/composer';
 import { addTagDecorateCallback } from 'discourse/lib/to-markdown';
 
+const PLUGIN_NAME = 'kglw-setlist';
 const HTML_CLASS_NAME = 'kglwSetlist';
 // const HTML_CLASS_NAME_PROCESSED = 'kglwSetlistProcessed';
 
@@ -46,11 +47,11 @@ export function initializeSetlistCode(api) {
 
   // decorate "cooked" content (after it's been rendered)
   // https://github.com/discourse/discourse/blob/1526d1f97d46/app/assets/javascripts/discourse/app/lib/plugin-api.js#L369
-  api.decorateCookedElement(renderSetlist, { id: 'kglw-setlist' }); // what's this ID for?
+  api.decorateCookedElement(renderSetlist, { id: PLUGIN_NAME }); // what's this ID for?
 }
 
 export default {
-  name: 'setlist',
+  name: PLUGIN_NAME,
   initialize() {
     withPluginApi('1.3.0', initializeSetlistCode);
   },
