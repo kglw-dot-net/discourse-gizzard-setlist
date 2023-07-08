@@ -52,7 +52,7 @@ export function initializeSetlistCode(api) {
 
 export default {
   name: PLUGIN_NAME,
-  initialize() {
+  initialize(container) {
     const siteSettings = container.lookup('site-settings:main');
     if (siteSettings.kglwSetlist_enabled)
       withPluginApi('1.3.0', initializeSetlistCode);
