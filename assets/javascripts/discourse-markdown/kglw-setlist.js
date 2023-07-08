@@ -9,13 +9,13 @@ export function setup(helper) {
 
   helper.allowList(['span.kglwSetlist']);
 
-  md.inline.bbcode.ruler.push('setlist', {
-    tag: 'setlist',
-    wrap: 'span.kglwSetlist'
-  });
-  // helper.registerPlugin(md => {
+  helper.registerPlugin(md => {
+    md.inline.bbcode.ruler.push('setlist', {
+      tag: 'setlist',
+      wrap: 'span.kglwSetlist'
+    });
   //   md.inline.push('setlist', (state, silent) => {
   //     
   //   });
-  // });
+  });
 }
