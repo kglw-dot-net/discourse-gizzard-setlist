@@ -9,20 +9,27 @@ const HTML_CLASS_NAME_PROCESSED = 'kglwSetlistProcessed';
 async function doTheSetlist(setlistElement) {
   global.console.log('do the setlist!', fetch, setlistElement);
   if (!fetch)
-    return;
+    return console.error('no fetch...');
   setlistElement.classList.remove(HTML_CLASS_NAME);
   const date = setlistElement.innerHTML;
-  const result = (await fetch(`https://kglw.net/api/v1/setlists/showdate/${date}.json`)).json()
-  global.console.log({result});
-  const showData = result.data.map(song => `${song.songname}${song.transition}`).join('')
-  setlistElement.innerHTML = showData
+  const showData = (await (await fetch(`https://kglw.net/api/v1/shows/showdate/${date}.json`)).json()).data
+  const setlistData = (await (await fetch(`https://kglw.net/api/v1/setlists/showdate/${date}.json`)).json()).data
+  global.console.log({showData, setlistData});
+  const setlist = setlistData.map(song => `${song.songname}${song.transition}`).join('')
+  setlistElement.attributes.title = `${showData.showdate} @ ${showData.venuename}\n\n${setlist}`
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
 }
 
 function renderSetlist(cookedElement) {
-  cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`).forEach((s) => {
-    global.console.log('renderSetlist', s);
-    doTheSetlist(s);
+  cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`).forEach((elem) => {
+    global.console.log('renderSetlist', elem);
+    elem.addEventListener('click', () => {
+      doTheSetlist(elem);
+    });
+    elem.addEventListener('keydown', ({key}) => {
+      if (key === 'Enter')
+        doTheSetlist(elem);
+    });
   });
 }
 
@@ -32,6 +39,8 @@ export function initializeSetlistCode(api) {
   ComposerController.reopen({
     actions: {
       insertSetlist() { // matches action prop passed to addToolbarPopupMenuOptionsCallback
+        // TODO check date format...
+        global.console.log('insertSetlist...');
         this.get('toolbarEvent').applySurround(
           '[setlist]',
           '[/setlist]',
@@ -43,10 +52,11 @@ export function initializeSetlistCode(api) {
   });
 
   addBlockDecorateCallback(function (text) {
-    global.console.log('aTDC', text, this.element, [...this.element.classList]);
+    global.console.log('add callback...', text, this.element, [...this.element.classList]);
     if ([...this.element.classList].includes(HTML_CLASS_NAME)) {
       this.prefix = '[setlist]';
       this.suffix = '[/setlist]';
+      return this.text.trim();
     }
   });
 
