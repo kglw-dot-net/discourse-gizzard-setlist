@@ -4,24 +4,24 @@ import { addTagDecorateCallback } from 'discourse/lib/to-markdown';
 
 const PLUGIN_NAME = 'setlist';
 const HTML_CLASS_NAME = 'kglwSetlist';
-// const HTML_CLASS_NAME_PROCESSED = 'kglwSetlistProcessed';
+const HTML_CLASS_NAME_PROCESSED = 'kglwSetlistProcessed';
 
 async function doTheSetlist(setlistElement) {
-  console.log('do the setlist!', fetch);
+  global.console.log('do the setlist!', fetch, setlistElement);
   if (!fetch)
     return;
+  setlistElement.classList.remove(HTML_CLASS_NAME);
   const date = setlistElement.innerHTML;
   const result = (await fetch(`https://kglw.net/api/v1/setlists/showdate/${date}.json`)).json()
   global.console.log({result});
   const showData = result.data.map(song => `${song.songname}${song.transition}`).join('')
   setlistElement.innerHTML = showData
+  setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
 }
 
 function renderSetlist(cookedElement) {
   cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`).forEach((s) => {
     global.console.log('renderSetlist', s);
-    s.classList.remove(HTML_CLASS_NAME);
-    s.classList.add('spoiled');
     doTheSetlist(s);
   });
 }
@@ -32,17 +32,19 @@ export function initializeSetlistCode(api) {
   ComposerController.reopen({
     actions: {
       insertSetlist() { // matches action prop passed to addToolbarPopupMenuOptionsCallback
-        this.get('toolbarEvent').applySurround('[setlist]', '[/setlist]',
-          'setlist_text',
+        this.get('toolbarEvent').applySurround(
+          '[setlist]',
+          '[/setlist]',
+          'setlist_text', // locale string js.composer.setlist_text
           { multiline: false, useBlockMode: false }
         );
       },
     },
   });
 
-  addTagDecorateCallback(function () {
-    global.console.log('aTDC', this.element);
-    if (this.element.attributes.class === 'spoiled') {
+  addBlockDecorateCallback(function (text) {
+    global.console.log('aTDC', text, this.element, [...this.element.classList]);
+    if ([...this.element.classList].includes(HTML_CLASS_NAME)) {
       this.prefix = '[setlist]';
       this.suffix = '[/setlist]';
     }
