@@ -20,6 +20,11 @@ function log(...msgs) {
   console.log('%cKGLW', 'color:chartreuse;background:black;padding:0.2rem;border-radius:1rem', ...msgs)
 }
 
+function hasTouchCapabilities() {
+  // https://github.com/discourse/discourse/blob/8e63244e72f/app/assets/javascripts/discourse/app/lib/d-tooltip.js#L7C1-L9C2
+  return navigator.maxTouchPoints > 1 || 'ontouchstart' in window;
+}
+
 async function doTheSetlist(setlistElement) {
   log('doTheSetlist!!', fetch, setlistElement);
   if (!fetch)
@@ -28,7 +33,7 @@ async function doTheSetlist(setlistElement) {
   const matches = setlistElement.innerHTML.match(REGEX_DATE_FORMAT);
   if (matches.length < 4 || matches.length > 5)
     return console.error('no regex matches', setlistElement.innerHTML, REGEX_DATE_FORMAT);
-  const {year, month, day, which} = matches.groups
+  const {year, month, day, which = 0} = matches.groups
   const date = `${year}-${month}-${day}`
   const showData = //(await (await fetch(`https://kglw.net/api/v1/shows/showdate/${date}.json`)).json()).data
    [
@@ -1022,13 +1027,22 @@ async function doTheSetlist(setlistElement) {
     }
   ]
   log('doTheSetlist', {showData, setlistData, tippy});
-  const setlist = setlistData.map(song => `${song.songname}${song.transition}`).join('') // TODO handle multiple sets
+  // const setlist = setlistData.map(song => `${song.songname}${song.transition}`).join('') // TODO handle multiple sets
+  const setlist = sD.reduce((a,e,idx)=>{
+    if (!a[e.setnumber]) a[e.setnumber] = []
+    a[e.setnumber][e.position] = e.songname + e.transition
+    return a
+  }, []).reduce((a,e,index)=>{
+    if (e) return a + '\n' + `Set ${index}: ` + e.join('');
+    return a
+  }, "")
   tippy(setlistElement, {
-    content: `${showData.showdate} @ ${showData.venuename}\n\n${setlist}`,
+    content: `<p>${showData[which].showdate} @ ${showData[which].venuename}</p>${setlist}`,
     placement: 'top-start',
     duration: 0,
     theme: 'translucent',
     interactive: true,
+    trigger: hasTouchCapabilities() ? "click" : "mouseenter",
   });
   setlistElement.classList.remove(HTML_CLASS_NAME_PROCESSING);
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
