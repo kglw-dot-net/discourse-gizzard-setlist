@@ -6,8 +6,13 @@
   cursor: pointer;
 }
 
-.kglwSetlist-invalid {
+.kglwSetlist-error {
   border: 1px dotted #E00a;
+  background: #8008;
+}
+
+.kglwSetlist-invalid {
+  border: 1px dashed #E00a;
   background: #8008;
 }
 
