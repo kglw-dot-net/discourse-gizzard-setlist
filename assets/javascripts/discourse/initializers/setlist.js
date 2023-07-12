@@ -4,8 +4,9 @@ import { addBlockDecorateCallback, addTagDecorateCallback } from 'discourse/lib/
 
 const PLUGIN_NAME = 'setlist'; // TBD Does this have to match the filename?
 const HTML_CLASS_NAME = 'kglwSetlist';
-const HTML_CLASS_NAME_PROCESSED = 'kglwSetlistServed';
-const REGEX_DATE_FORMAT = /^(\d{4})-(\d{2})-(\d{2})(?!#(\d))?$/ // TODO check date format... ...set class `kglwSetlist-invalid` if no good
+const HTML_CLASS_NAME_PROCESSED = '${HTML_CLASS_NAME}-processed';
+const HTML_CLASS_NAME_INVALID = `${HTML_CLASS_NAME}-invalid`;
+const REGEX_DATE_FORMAT = /^(\d{4})-(\d{2})-(\d{2})(?!#(\d))?$/ // TODO check date format...
 
 function log(...msgs) {
   console.log('%cKGLW', 'color:chartreuse;background:black;padding:0.2rem;border-radius:1rem', ...msgs)
@@ -1026,7 +1027,6 @@ export function initializeSetlistCode(api) {
           'setlist_text', // locale string js.composer.setlist_text
           { multiline: false, useBlockMode: false }
         );
-        log('insertSetlist...', this, ...arguments); // this is okay... but it doesn't get cooked??
       },
     },
   });
@@ -1042,8 +1042,7 @@ export function initializeSetlistCode(api) {
 
   addBlockDecorateCallback(function (text) {
     log('addBlockDecorateCallback', text, this.element);
-    const { name, attributes } = this.element;
-    if (name === 'div' && attributes.class === HTML_CLASS_NAME_PROCESSED) {
+    if (this.element.name === 'div' && [...this.element.classList].includes(HTML_CLASS_NAME)) {
       this.prefix = '[setlist]';
       this.suffix = '[/setlist]';
       return text.trim();
@@ -1054,23 +1053,25 @@ export function initializeSetlistCode(api) {
   // https://github.com/discourse/discourse/blob/1526d1f97d46/app/assets/javascripts/discourse/app/lib/plugin-api.js#L369
   api.decorateCookedElement(function(cookedElement) {
     cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`).forEach((setlistElem) => {
-      // log('decorateCookedElement...', setlistElem);
-      setlistElem.classList = `${setlistElem.classList} ${HTML_CLASS_NAME}`
+      log('decorateCookedElement...', setlistElem);
+      setlistElem.classList.add(HTML_CLASS_NAME);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
         const clickHandler = () => {
-          setlistElem.removeEventHandler(clickHandler);
+          setlistElem?.removeEventHandler('click', clickHandler);
+          setlistElem?.removeEventHandler('keydown', keydownHandler);
           doTheSetlist(setlistElem);
         };
         const keydownHandler = ({key}) => {
           if (key === 'Enter') {
-            setlistElem.removeEventHandler(keydownHandler);
+            setlistElem?.removeEventHandler('click', clickHandler);
+            setlistElem?.removeEventHandler('keydown', keydownHandler);
             doTheSetlist(setlistElem);
           }
         };
         setlistElem.addEventListener('click', clickHandler);
         setlistElem.addEventListener('keydown', keydownHandler);
       } else {
-        setlistElem.classList = `${setlistElem.classList} ${HTML_CLASS_NAME}-invalid`
+        setlistElem.classList.add(HTML_CLASS_NAME_INVALID)
       }
     });
   }, {
