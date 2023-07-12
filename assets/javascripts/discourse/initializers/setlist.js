@@ -35,11 +35,16 @@ async function doTheSetlist(setlistElement) {
     // TODO parallel-ize these requests
     const {showdate, venuename, city, state, country, permalink} = (await (await fetch(`${API_BASE}/shows/showdate/${date}.json`)).json()).data[which-1]; // `-1` bc arrays are 0-indexed...
     const setlistData = (await (await fetch(`${API_BASE}/setlists/showdate/${date}.json`)).json()).data;
+    // n.b. these are _not_ necessarily in the "correct" order in the data's arrays...
     const setlistObject = setlistData.reduce((obj,trackData,idx)=>{
-      if (!obj[trackData.setnumber]) obj[trackData.setnumber] = [];
+      if (trackData.showorder !== which)
+        return obj;
+      if (!obj[trackData.setnumber])
+        obj[trackData.setnumber] = [];
       obj[trackData.setnumber][trackData.position] = trackData.songname + trackData.transition;
       return obj;
     }, {})
+    log('setlist stuff...', {setlistData, setlistObject, permalink});
     const setlist = Object.entries(setlistObject).reduce((setlistStr,[whichSet,tracksArr])=>{
       if (tracksArr) return setlistStr + `<br/><b>${whichSet === 'e' ? 'Encore' : `Set ${whichSet}`}:</b> ` + tracksArr.join('');
       return setlistStr;
@@ -52,7 +57,7 @@ async function doTheSetlist(setlistElement) {
       interactive: true,
       trigger: hasTouchCapabilities() ? 'click' : 'mouseenter',
       allowHTML: true,
-    });
+    }).show();
     setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
   } catch (error) {
     setlistElement.classList.add(HTML_CLASS_NAME_ERROR);
