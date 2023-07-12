@@ -28,7 +28,7 @@ function hasTouchCapabilities() {
 }
 
 async function doTheSetlist(setlistElement) {
-  log('doTheSetlist!!', fetch, setlistElement);
+  // log('doTheSetlist!!', fetch, setlistElement);
   if (!fetch)
     return console.error('no fetch...');
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSING);
@@ -38,22 +38,19 @@ async function doTheSetlist(setlistElement) {
   try {
     const {year, month, day, which = 1} = matches.groups
     const date = `${year}-${month}-${day}`
-    const showData = (await (await fetch(`${API_BASE}/shows/showdate/${date}.json`)).json()).data[which-1]; // `-1` bc arrays are 0-indexed...
+    const {showdate, venuename, city, state, country, permalink} = (await (await fetch(`${API_BASE}/shows/showdate/${date}.json`)).json()).data[which-1]; // `-1` bc arrays are 0-indexed...
     const setlistData = (await (await fetch(`${API_BASE}/setlists/showdate/${date}.json`)).json()).data;
-    log('doTheSetlist', {showData, setlistData});
-    const setlistObject = setlistData.reduce((a,e,idx)=>{
-      if (!a[e.setnumber]) a[e.setnumber] = [];
-      a[e.setnumber][e.position] = e.songname + e.transition;
-      return a;
+    const setlistObject = setlistData.reduce((obj,trackData,idx)=>{
+      if (!obj[trackData.setnumber]) obj[trackData.setnumber] = [];
+      obj[trackData.setnumber][trackData.position] = trackData.songname + trackData.transition;
+      return obj;
     }, {})
-    const setlist = Object.entries(setlistObject).reduce((a,[k,e],index)=>{
-      log('reducing...', a, k, e);
-      const whichSet = k;
-      if (e) return a + `<br/>${k === 'e' ? 'Encore' : `Set ${index}`}: ` + e.join('');
-      return a;
+    const setlist = Object.entries(setlistObject).reduce((setlistStr,[whichSet,tracksArr])=>{
+      if (tracksArr) return setlistStr + `<br/><b>${whichSet === 'e' ? 'Encore' : `Set ${whichSet}`}:</b> ` + tracksArr.join('');
+      return setlistStr;
     }, '')
     tippy(setlistElement, {
-      content: `<b>${showData.showdate} @ ${showData.venuename} (${showData.city}, ${showData.state || showData.country})</b><br/>${setlist}`,
+      content: `<a href="https://kglw.net/setlists/${permalink}" target="_blank" rel="noopener">${showdate} @ ${venuename} (${city}, ${state || country})</a>${setlist}`,
       placement: 'top-start',
       duration: 0,
       theme: 'translucent',
