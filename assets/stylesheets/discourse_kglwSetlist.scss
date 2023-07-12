@@ -1,20 +1,22 @@
 .kglwSetlist {
-  box-shadow: inset 1px 2px 3px #000a;
-  padding: 1px;
+  border: 1px solid #0E0a;
+  border-radius: 0.33em;
+  padding: 1px 3px;
+  margin: 0 -1px;
   cursor: pointer;
 }
 
 .kglwSetlist-invalid {
-  border: 1px solid red;
+  border: 1px dotted #E00a;
   background: #8008;
 }
 
 .kglwSetlist-processing {
-  background: gray;
+  border-color: gray;
 }
 
 .kglwSetlist-processed {
-  border-radius: 0.5em;
+  border-color: #00Ea;
   cursor: help;
 }
 .kglwSetlist-processed:hover {

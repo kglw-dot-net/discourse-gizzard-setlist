@@ -1,7 +1,7 @@
 // TODO...
 // * un-hardcode data
-// * handle multiple shows on single date
-// * tweak display of setlist (split up sets)
+// * handle multiple shows on single date... `showorder`
+// * tweak display of setlist (split up sets)... `setnumber`
 
 import tippy from 'tippy.js';
 
@@ -14,7 +14,7 @@ const HTML_CLASS_NAME = 'kglwSetlist';
 const HTML_CLASS_NAME_INVALID = `${HTML_CLASS_NAME}-invalid`;
 const HTML_CLASS_NAME_PROCESSED = `${HTML_CLASS_NAME}-processed`;
 const HTML_CLASS_NAME_PROCESSING = `${HTML_CLASS_NAME}-processing`;
-const REGEX_DATE_FORMAT = /^(\d{4})-(\d{2})-(\d{2})(?!#(\d))?$/
+const REGEX_DATE_FORMAT = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?!#(?<which>\d))?$/
 
 function log(...msgs) {
   console.log('%cKGLW', 'color:chartreuse;background:black;padding:0.2rem;border-radius:1rem', ...msgs)
@@ -24,9 +24,12 @@ async function doTheSetlist(setlistElement) {
   log('doTheSetlist!!', fetch, setlistElement);
   if (!fetch)
     return console.error('no fetch...');
-  setlistElement.classList.remove(HTML_CLASS_NAME);
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSING);
-  const date = setlistElement.innerHTML;
+  const matches = setlistElement.innerHTML.match(REGEX_DATE_FORMAT);
+  if (matches.length < 3 || matches.length > 4)
+    return console.error('no regex matches', setlistElement.innerHTML, REGEX_DATE_FORMAT);
+  const {year, month, day, which} = matches.groups
+  const date = `${year}-${month}-${day}`
   const showData = //(await (await fetch(`https://kglw.net/api/v1/shows/showdate/${date}.json`)).json()).data
    [
     {
@@ -1018,7 +1021,7 @@ async function doTheSetlist(setlistElement) {
         "isjam": 0
     }
   ]
-  log('doTheSetlist', {showData, setlistData});
+  log('doTheSetlist', {showData, setlistData, tippy});
   const setlist = setlistData.map(song => `${song.songname}${song.transition}`).join('') // TODO handle multiple sets
   tippy(setlistElement, {
     content: `${showData.showdate} @ ${showData.venuename}\n\n${setlist}`,
@@ -1026,7 +1029,6 @@ async function doTheSetlist(setlistElement) {
     duration: 0,
     theme: 'translucent',
     interactive: true,
-    trigger: 'hover',
   });
   setlistElement.classList.remove(HTML_CLASS_NAME_PROCESSING);
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
