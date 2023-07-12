@@ -1,24 +1,21 @@
 .kglwSetlist {
-  background: chartreuse;
+  box-shadow: inset 1px 2px 3px #000a;
+  padding: 1px;
+  cursor: pointer;
 }
+
 .kglwSetlist-invalid {
   border: 1px solid red;
   background: #8008;
 }
 
-.kglwSetlist-processed {
-  background: pink;
-  border-radius: 0.5em;
-  box-shadow: inset 1px 2px 3px #000a;
-  cursor: help;
-
-  &:hover {
-    box-shadow: none;
-  }
+.kglwSetlist-processing {
+  background: gray;
 }
 
-.kglwSetlist-popup {
-  border-radius: 1rem;
-  padding: 0.3rem 1rem;
-  font-size: 0.9rem;
+.kglwSetlist-processed {
+  border-radius: 0.5em;
+  cursor: help;
+}
+.kglwSetlist-processed:hover {
 }

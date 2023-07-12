@@ -3,7 +3,7 @@
 // * handle multiple shows on single date
 // * tweak display of setlist (split up sets)
 
-import loadScript from 'discourse/lib/load-script';
+import tippy from 'tippy.js';
 
 import { withPluginApi } from 'discourse/lib/plugin-api';
 import ComposerController from 'discourse/controllers/composer';
@@ -11,8 +11,9 @@ import { addBlockDecorateCallback, addTagDecorateCallback } from 'discourse/lib/
 
 const PLUGIN_NAME = 'setlist'; // TBD Does this have to match the filename?
 const HTML_CLASS_NAME = 'kglwSetlist';
-const HTML_CLASS_NAME_PROCESSED = '${HTML_CLASS_NAME}-processed';
 const HTML_CLASS_NAME_INVALID = `${HTML_CLASS_NAME}-invalid`;
+const HTML_CLASS_NAME_PROCESSED = `${HTML_CLASS_NAME}-processed`;
+const HTML_CLASS_NAME_PROCESSING = `${HTML_CLASS_NAME}-processing`;
 const REGEX_DATE_FORMAT = /^(\d{4})-(\d{2})-(\d{2})(?!#(\d))?$/
 
 function log(...msgs) {
@@ -24,6 +25,7 @@ async function doTheSetlist(setlistElement) {
   if (!fetch)
     return console.error('no fetch...');
   setlistElement.classList.remove(HTML_CLASS_NAME);
+  setlistElement.classList.add(HTML_CLASS_NAME_PROCESSING);
   const date = setlistElement.innerHTML;
   const showData = //(await (await fetch(`https://kglw.net/api/v1/shows/showdate/${date}.json`)).json()).data
    [
@@ -1018,7 +1020,7 @@ async function doTheSetlist(setlistElement) {
   ]
   log('doTheSetlist', {showData, setlistData});
   const setlist = setlistData.map(song => `${song.songname}${song.transition}`).join('') // TODO handle multiple sets
-  tippy?.(setlistElement, {
+  tippy(setlistElement, {
     content: `${showData.showdate} @ ${showData.venuename}\n\n${setlist}`,
     placement: 'top-start',
     duration: 0,
@@ -1026,6 +1028,7 @@ async function doTheSetlist(setlistElement) {
     interactive: true,
     trigger: 'hover',
   });
+  setlistElement.classList.remove(HTML_CLASS_NAME_PROCESSING);
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
 }
 
@@ -1070,10 +1073,6 @@ export function initializeSetlistCode(api) {
       log('decorateCookedElement...', setlistElem);
       setlistElem.classList.add(HTML_CLASS_NAME);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
-        Promise.all([
-          loadScript('https://unpkg.com/@popperjs/core@2'),
-          loadScript('https://unpkg.com/tippy.js@6'),
-        ]);
         const removeListeners = (elem) => {
           elem.removeEventListener('click', clickHandler);
           elem.removeEventListener('keydown', keydownHandler);
