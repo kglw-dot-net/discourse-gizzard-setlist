@@ -53,12 +53,13 @@ async function doTheSetlist(setlistElement) {
       return a;
     }, '')
     tippy(setlistElement, {
-      content: `${showData.showdate} @ ${showData.venuename} (${showData.city}, ${showData.state || showData.country})<br/>${setlist}`,
+      content: `<b>${showData.showdate} @ ${showData.venuename} (${showData.city}, ${showData.state || showData.country})</b><br/>${setlist}`,
       placement: 'top-start',
       duration: 0,
       theme: 'translucent',
       interactive: true,
       trigger: hasTouchCapabilities() ? 'click' : 'mouseenter',
+      allowHTML: true,
     });
     setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
   } catch (error) {
