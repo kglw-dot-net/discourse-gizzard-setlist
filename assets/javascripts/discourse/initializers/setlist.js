@@ -26,7 +26,7 @@ async function doTheSetlist(setlistElement) {
     return console.error('no fetch...');
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSING);
   const matches = setlistElement.innerHTML.match(REGEX_DATE_FORMAT);
-  if (matches.length < 3 || matches.length > 4)
+  if (matches.length < 4 || matches.length > 5)
     return console.error('no regex matches', setlistElement.innerHTML, REGEX_DATE_FORMAT);
   const {year, month, day, which} = matches.groups
   const date = `${year}-${month}-${day}`
