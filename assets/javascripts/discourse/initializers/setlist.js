@@ -1,7 +1,7 @@
 // TODO...
 // * un-hardcode data
-// * handle multiple shows on single date... `showorder`
 // * tweak display of setlist (split up sets)... `setnumber`
+// * handle encores
 
 import tippy from 'tippy.js';
 
@@ -1028,14 +1028,14 @@ async function doTheSetlist(setlistElement) {
   ]
   log('doTheSetlist', {showData, setlistData, tippy});
   // const setlist = setlistData.map(song => `${song.songname}${song.transition}`).join('') // TODO handle multiple sets
-  const setlist = sD.reduce((a,e,idx)=>{
+  const setlist = setlistData.reduce((a,e,idx)=>{
     if (!a[e.setnumber]) a[e.setnumber] = []
     a[e.setnumber][e.position] = e.songname + e.transition
     return a
   }, []).reduce((a,e,index)=>{
     if (e) return a + '\n' + `Set ${index}: ` + e.join('');
     return a
-  }, "")
+  }, '')
   tippy(setlistElement, {
     content: `<p>${showData[which].showdate} @ ${showData[which].venuename}</p>${setlist}`,
     placement: 'top-start',
