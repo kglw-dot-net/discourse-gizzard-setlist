@@ -32,16 +32,16 @@ async function doTheSetlist(setlistElement) {
   try {
     const {year, month, day, which = 1} = matches.groups
     const date = `${year}-${month}-${day}`
+    log({date,which})
     // TODO parallel-ize these requests
     const {showdate, venuename, city, state, country, permalink} = (await (await fetch(`${API_BASE}/shows/showdate/${date}.json`)).json()).data[which-1]; // `-1` bc arrays are 0-indexed...
     const setlistData = (await (await fetch(`${API_BASE}/setlists/showdate/${date}.json`)).json()).data;
-    // n.b. these are _not_ necessarily in the "correct" order in the data's arrays...
-    const setlistObject = setlistData.reduce((obj,trackData,idx)=>{
-      if (trackData.showorder !== which)
+    const setlistObject = setlistData.reduce((obj,{showorder, setnumber, position, songname, transition},idx)=>{
+      if (showorder !== which)
         return obj;
-      if (!obj[trackData.setnumber])
-        obj[trackData.setnumber] = [];
-      obj[trackData.setnumber][trackData.position] = trackData.songname + trackData.transition;
+      if (!obj[setnumber])
+        obj[setnumber] = [];
+      obj[setnumber][position] = songname + transition;
       return obj;
     }, {})
     log('setlist stuff...', {setlistData, setlistObject, permalink});
