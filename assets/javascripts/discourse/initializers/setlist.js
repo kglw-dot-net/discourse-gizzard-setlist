@@ -1,5 +1,6 @@
 // TODO...
 // * handle encores
+// * newlines?? or html?
 
 import tippy from 'tippy.js';
 
@@ -37,29 +38,32 @@ async function doTheSetlist(setlistElement) {
     const date = `${year}-${month}-${day}`
     const showData = (await (await fetch(`https://kglw.net/api/v1/shows/showdate/${date}.json`)).json()).data
     const setlistData = (await (await fetch(`https://kglw.net/api/v1/setlists/showdate/${date}.json`)).json()).data
-    log('doTheSetlist', {showData, setlistData, tippy});
-    const setlist = setlistData.reduce((a,e,idx)=>{
+    log('doTheSetlist', {showData, setlistData});
+    const setlistObject = setlistData.reduce((a,e,idx)=>{
       if (!a[e.setnumber]) a[e.setnumber] = []
       a[e.setnumber][e.position] = e.songname + e.transition
       return a
-    }, []).reduce((a,e,index)=>{
-      if (e) return a + ` — Set ${index}: ` + e.join('');
+    }, {})
+    Object.entries(setlistObject).reduce((a,(k,e),index)=>{
+      log('reducing...', a, k, e);
+      const whichSet = k
+      if (e) return a + `<br/>${k === 'e' ? 'Encore' : `Set ${index}`}: ` + e.join('');
       return a
     }, '')
     tippy(setlistElement, {
-      content: `${showData[which].showdate} @ ${showData[which].venuename}… ${setlist}`,
+      content: `${showData[which].showdate} @ ${showData[which].venuename}…<br/>${setlist}`,
       placement: 'top-start',
       duration: 0,
       theme: 'translucent',
       interactive: true,
       trigger: hasTouchCapabilities() ? 'click' : 'mouseenter',
     });
+    setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
   } catch (error) {
     setlistElement.classList.add(HTML_CLASS_NAME_ERROR);
     return console.error(error);
   } finally {
     setlistElement.classList.remove(HTML_CLASS_NAME_PROCESSING);
-    setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
   }
 }
 

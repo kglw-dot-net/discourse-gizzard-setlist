@@ -8,7 +8,8 @@
 
 .kglwSetlist-error {
   border: 1px dotted #E00a;
-  background: #8008;
+  background: #4004;
+  cursor: help;
 }
 
 .kglwSetlist-invalid {
@@ -23,6 +24,4 @@
 .kglwSetlist-processed {
   border-color: #00Ea;
   cursor: help;
-}
-.kglwSetlist-processed:hover {
 }
