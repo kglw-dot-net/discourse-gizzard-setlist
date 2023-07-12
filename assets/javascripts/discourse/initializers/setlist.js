@@ -1,6 +1,7 @@
 // TODO...
 // * handle encores
 // * newlines?? or html?
+// * double-check multiple shows on one day... using #1 and #2 and no #...
 
 import tippy from 'tippy.js';
 
@@ -14,7 +15,8 @@ const HTML_CLASS_NAME_ERROR = `${HTML_CLASS_NAME}-error`;
 const HTML_CLASS_NAME_INVALID = `${HTML_CLASS_NAME}-invalid`;
 const HTML_CLASS_NAME_PROCESSED = `${HTML_CLASS_NAME}-processed`;
 const HTML_CLASS_NAME_PROCESSING = `${HTML_CLASS_NAME}-processing`;
-const REGEX_DATE_FORMAT = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?!#(?<which>\d))?$/
+const REGEX_DATE_FORMAT = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?!#(?<which>\d))?$/;
+const API_BASE = 'https://kglw.net/api/v1';
 
 function log(...msgs) {
   console.log('%cKGLW', 'color:chartreuse;background:black;padding:0.5rem;border-radius:1rem', ...msgs)
@@ -34,24 +36,24 @@ async function doTheSetlist(setlistElement) {
   if (matches.length < 4 || matches.length > 5)
     return console.error('no regex matches', setlistElement.innerHTML, REGEX_DATE_FORMAT);
   try {
-    const {year, month, day, which = 0} = matches.groups
+    const {year, month, day, which = 1} = matches.groups
     const date = `${year}-${month}-${day}`
-    const showData = (await (await fetch(`https://kglw.net/api/v1/shows/showdate/${date}.json`)).json()).data
-    const setlistData = (await (await fetch(`https://kglw.net/api/v1/setlists/showdate/${date}.json`)).json()).data
+    const showData = (await (await fetch(`${API_BASE}/shows/showdate/${date}.json`)).json()).data[which-1]; // `-1` bc arrays are 0-indexed...
+    const setlistData = (await (await fetch(`${API_BASE}/setlists/showdate/${date}.json`)).json()).data;
     log('doTheSetlist', {showData, setlistData});
     const setlistObject = setlistData.reduce((a,e,idx)=>{
-      if (!a[e.setnumber]) a[e.setnumber] = []
-      a[e.setnumber][e.position] = e.songname + e.transition
-      return a
+      if (!a[e.setnumber]) a[e.setnumber] = [];
+      a[e.setnumber][e.position] = e.songname + e.transition;
+      return a;
     }, {})
     const setlist = Object.entries(setlistObject).reduce((a,(k,e),index)=>{
       log('reducing...', a, k, e);
-      const whichSet = k
+      const whichSet = k;
       if (e) return a + `<br/>${k === 'e' ? 'Encore' : `Set ${index}`}: ` + e.join('');
-      return a
+      return a;
     }, '')
     tippy(setlistElement, {
-      content: `${showData[which].showdate} @ ${showData[which].venuename}…<br/>${setlist}`,
+      content: `${showData.showdate} @ ${showData.venuename} (${showData.city}, ${showData.state || showData.country})<br/>${setlist}`,
       placement: 'top-start',
       duration: 0,
       theme: 'translucent',
