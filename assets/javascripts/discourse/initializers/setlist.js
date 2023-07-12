@@ -1,8 +1,3 @@
-// TODO...
-// * handle encores
-// * newlines?? or html?
-// * double-check multiple shows on one day... using #1 and #2 and no #...
-
 import tippy from 'tippy.js';
 
 import { withPluginApi } from 'discourse/lib/plugin-api';
@@ -15,11 +10,11 @@ const HTML_CLASS_NAME_ERROR = `${HTML_CLASS_NAME}-error`;
 const HTML_CLASS_NAME_INVALID = `${HTML_CLASS_NAME}-invalid`;
 const HTML_CLASS_NAME_PROCESSED = `${HTML_CLASS_NAME}-processed`;
 const HTML_CLASS_NAME_PROCESSING = `${HTML_CLASS_NAME}-processing`;
-const REGEX_DATE_FORMAT = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?!#(?<which>\d))?$/;
+const REGEX_DATE_FORMAT = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?:#(?<which>\d))?$/;
 const API_BASE = 'https://kglw.net/api/v1';
 
 function log(...msgs) {
-  console.log('%cKGLW', 'color:chartreuse;background:black;padding:0.5rem;border-radius:1rem', ...msgs)
+  console.trace('%cKGLW', 'color:chartreuse;background:black;padding:0.5rem;border-radius:1rem', ...msgs)
 }
 
 function hasTouchCapabilities() {
@@ -28,16 +23,16 @@ function hasTouchCapabilities() {
 }
 
 async function doTheSetlist(setlistElement) {
-  // log('doTheSetlist!!', fetch, setlistElement);
   if (!fetch)
     return console.error('no fetch...');
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSING);
   const matches = setlistElement.innerHTML.match(REGEX_DATE_FORMAT);
-  if (matches.length < 4 || matches.length > 5)
-    return console.error('no regex matches', setlistElement.innerHTML, REGEX_DATE_FORMAT);
+  if (matches.length !== 5)
+    return console.error('regex match does not look right', setlistElement.innerHTML, REGEX_DATE_FORMAT);
   try {
     const {year, month, day, which = 1} = matches.groups
     const date = `${year}-${month}-${day}`
+    // TODO parallel-ize these requests
     const {showdate, venuename, city, state, country, permalink} = (await (await fetch(`${API_BASE}/shows/showdate/${date}.json`)).json()).data[which-1]; // `-1` bc arrays are 0-indexed...
     const setlistData = (await (await fetch(`${API_BASE}/setlists/showdate/${date}.json`)).json()).data;
     const setlistObject = setlistData.reduce((obj,trackData,idx)=>{
@@ -83,7 +78,7 @@ export function initializeSetlistCode(api) {
     },
   });
 
-  // convert nodes back to bbcode
+  // convert (inline) nodes back to bbcode
   addTagDecorateCallback(function (text) {
     log('addTagDecorateCallback', text, this.element);
     if ([...this.element.classList].includes(HTML_CLASS_NAME)) {
@@ -92,6 +87,7 @@ export function initializeSetlistCode(api) {
     }
   });
 
+  // convert (block) nodes back to bbcode
   addBlockDecorateCallback(function (text) {
     log('addBlockDecorateCallback', text, this.element);
     if (this.element.name === 'div' && [...this.element.classList].includes(HTML_CLASS_NAME)) {
