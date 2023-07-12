@@ -1056,15 +1056,17 @@ export function initializeSetlistCode(api) {
       log('decorateCookedElement...', setlistElem);
       setlistElem.classList.add(HTML_CLASS_NAME);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
+        const removeListeners = (elem) => {
+          elem.removeEventListener('click', clickHandler);
+          elem.removeEventListener('keydown', keydownHandler);
+        };
         const clickHandler = () => {
-          setlistElem?.removeEventHandler('click', clickHandler);
-          setlistElem?.removeEventHandler('keydown', keydownHandler);
+          removeListeners(setlistElem);
           doTheSetlist(setlistElem);
         };
         const keydownHandler = ({key}) => {
           if (key === 'Enter') {
-            setlistElem?.removeEventHandler('click', clickHandler);
-            setlistElem?.removeEventHandler('keydown', keydownHandler);
+            removeListeners(setlistElem);
             doTheSetlist(setlistElem);
           }
         };

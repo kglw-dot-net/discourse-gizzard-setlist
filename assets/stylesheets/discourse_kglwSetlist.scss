@@ -1,13 +1,12 @@
 .kglwSetlist {
   background: chartreuse;
-
-  &-invalid {
-    border: 1px solid red;
-    background: #8008;
-  }
+}
+.kglwSetlist-invalid {
+  border: 1px solid red;
+  background: #8008;
 }
 
-.kglwSetlistProcessed {
+.kglwSetlist-processed {
   background: pink;
   border-radius: 0.5em;
   box-shadow: inset 1px 2px 3px #000a;
@@ -18,7 +17,7 @@
   }
 }
 
-.kglwSetlistPopup {
+.kglwSetlist-popup {
   border-radius: 1rem;
   padding: 0.3rem 1rem;
   font-size: 0.9rem;
