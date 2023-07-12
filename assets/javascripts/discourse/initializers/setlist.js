@@ -44,7 +44,7 @@ async function doTheSetlist(setlistElement) {
       a[e.setnumber][e.position] = e.songname + e.transition
       return a
     }, {})
-    Object.entries(setlistObject).reduce((a,(k,e),index)=>{
+    const setlist = Object.entries(setlistObject).reduce((a,(k,e),index)=>{
       log('reducing...', a, k, e);
       const whichSet = k
       if (e) return a + `<br/>${k === 'e' ? 'Encore' : `Set ${index}`}: ` + e.join('');
