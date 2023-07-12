@@ -1,3 +1,10 @@
+// TODO...
+// * un-hardcode data
+// * handle multiple shows on single date
+// * tweak display of setlist (split up sets)
+
+import loadScript from 'discourse/lib/load-script';
+
 import { withPluginApi } from 'discourse/lib/plugin-api';
 import ComposerController from 'discourse/controllers/composer';
 import { addBlockDecorateCallback, addTagDecorateCallback } from 'discourse/lib/to-markdown';
@@ -6,7 +13,7 @@ const PLUGIN_NAME = 'setlist'; // TBD Does this have to match the filename?
 const HTML_CLASS_NAME = 'kglwSetlist';
 const HTML_CLASS_NAME_PROCESSED = '${HTML_CLASS_NAME}-processed';
 const HTML_CLASS_NAME_INVALID = `${HTML_CLASS_NAME}-invalid`;
-const REGEX_DATE_FORMAT = /^(\d{4})-(\d{2})-(\d{2})(?!#(\d))?$/ // TODO check date format...
+const REGEX_DATE_FORMAT = /^(\d{4})-(\d{2})-(\d{2})(?!#(\d))?$/
 
 function log(...msgs) {
   console.log('%cKGLW', 'color:chartreuse;background:black;padding:0.2rem;border-radius:1rem', ...msgs)
@@ -1010,8 +1017,15 @@ async function doTheSetlist(setlistElement) {
     }
   ]
   log('doTheSetlist', {showData, setlistData});
-  const setlist = setlistData.map(song => `${song.songname}${song.transition}`).join('')
-  setlistElement.attributes.title = `${showData.showdate} @ ${showData.venuename}\n\n${setlist}`
+  const setlist = setlistData.map(song => `${song.songname}${song.transition}`).join('') // TODO handle multiple sets
+  tippy?.(setlistElement, {
+    content: `${showData.showdate} @ ${showData.venuename}\n\n${setlist}`,
+    placement: 'top-start',
+    duration: 0,
+    theme: 'translucent',
+    interactive: true,
+    trigger: 'hover',
+  });
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
 }
 
@@ -1056,6 +1070,10 @@ export function initializeSetlistCode(api) {
       log('decorateCookedElement...', setlistElem);
       setlistElem.classList.add(HTML_CLASS_NAME);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
+        Promise.all([
+          loadScript('https://unpkg.com/@popperjs/core@2'),
+          loadScript('https://unpkg.com/tippy.js@6'),
+        ]);
         const removeListeners = (elem) => {
           elem.removeEventListener('click', clickHandler);
           elem.removeEventListener('keydown', keydownHandler);
