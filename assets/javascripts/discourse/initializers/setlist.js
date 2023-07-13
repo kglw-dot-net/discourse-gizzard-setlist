@@ -31,19 +31,20 @@ async function doTheSetlist(setlistElement) {
     return console.error('regex match does not look right', setlistElement.innerHTML, REGEX_DATE_FORMAT);
   try {
     const {year, month, day, which = 1} = matches.groups // note, these are all strings...
+    const whichNum = Number(which)
     const date = `${year}-${month}-${day}`
     // TODO parallel-ize these requests
-    const {showdate, venuename, city, state, country, permalink} = (await (await fetch(`${API_BASE}/shows/showdate/${date}.json`)).json()).data[Number(which)-1]; // `-1` bc arrays are 0-indexed...
+    const {showdate, venuename, city, state, country, permalink} = (await (await fetch(`${API_BASE}/shows/showdate/${date}.json`)).json()).data[whichNum - 1]; // `-1` bc arrays are 0-indexed...
     const setlistData = (await (await fetch(`${API_BASE}/setlists/showdate/${date}.json`)).json()).data;
     const setlistObject = setlistData.reduce((obj,{showorder, setnumber, position, songname, transition},idx)=>{
-      if (showorder !== Number(which))
+      if (showorder !== whichNum)
         return obj;
       if (!obj[setnumber])
         obj[setnumber] = [];
       obj[setnumber][position] = songname + transition;
       return obj;
     }, {})
-    log('setlist stuff...', {setlistData, setlistObject, permalink});
+    // log('setlist stuff...', {setlistData, setlistObject, permalink});
     const setlist = Object.entries(setlistObject).reduce((setlistStr,[whichSet,tracksArr])=>{
       if (tracksArr) return setlistStr + `<br/><b>${whichSet === 'e' ? 'Encore' : `Set ${whichSet}`}:</b> ` + tracksArr.join('');
       return setlistStr;
@@ -84,7 +85,7 @@ export function initializeSetlistCode(api) {
 
   // convert (inline) nodes back to bbcode
   addTagDecorateCallback(function (text) {
-    log('addTagDecorateCallback', text, this.element);
+    // log('addTagDecorateCallback', text, this.element);
     if ([...this.element.classList].includes(HTML_CLASS_NAME)) {
       this.prefix = '[setlist]';
       this.suffix = '[/setlist]';
@@ -93,7 +94,7 @@ export function initializeSetlistCode(api) {
 
   // convert (block) nodes back to bbcode
   addBlockDecorateCallback(function (text) {
-    log('addBlockDecorateCallback', text, this.element);
+    // log('addBlockDecorateCallback', text, this.element);
     if (this.element.name === 'div' && [...this.element.classList].includes(HTML_CLASS_NAME)) {
       this.prefix = '[setlist]';
       this.suffix = '[/setlist]';
@@ -105,7 +106,7 @@ export function initializeSetlistCode(api) {
   // https://github.com/discourse/discourse/blob/1526d1f97d46/app/assets/javascripts/discourse/app/lib/plugin-api.js#L369
   api.decorateCookedElement(function(cookedElement) {
     cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`).forEach((setlistElem) => {
-      log('decorateCookedElement...', setlistElem);
+      // log('decorateCookedElement...', setlistElem);
       setlistElem.classList.add(HTML_CLASS_NAME);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
         const removeListeners = (elem) => {
