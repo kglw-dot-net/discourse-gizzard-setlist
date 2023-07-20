@@ -5,6 +5,9 @@
   margin: 0 -1px;
   cursor: pointer;
 }
+.kglwSetlist:not(.kglw-processed):hover {
+  box-shadow: 0px 0px 2px 3px #0E09;
+}
 
 .kglwSetlist-error {
   border: 1px dotted #E00a;
@@ -23,5 +26,5 @@
 
 .kglwSetlist-processed {
   border-color: #00Ea;
-  cursor: help;
+  cursor: context-menu;
 }
