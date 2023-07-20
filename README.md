@@ -3,7 +3,9 @@ This is a [Discourse] plugin which turns a BBcode-style `[setlist]` tag into a [
 
 ## Usage
 
-A button will be added to the post editor, with the text "Gizzard Setlist".
+Entering `[setlist]` (date) `[/setlist]` tag into a post will turn into a click-to-load button which turns into a tooltip showing the specified show's setlist, with a link to the full page for the show.
+
+A button will be added to the post editor (in the "more"/gear icon menu), with the text "Gizz Setlist". Clicking it will insert a `[setlist]` example tag with the placeholder text "YYYY-MM-DD". (In the preview window, it will initially be red because the letters are an invalid date; once you've entered a valid (numerical) date, it will appear with a green border.)
 
 
 ## Links
