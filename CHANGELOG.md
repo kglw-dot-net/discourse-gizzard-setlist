@@ -19,6 +19,7 @@ n/a
 
 ### Updated
 
+* data: URL for API updated to use v2
 * style: hover effects
 
 

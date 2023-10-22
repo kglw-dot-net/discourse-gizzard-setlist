@@ -11,7 +11,7 @@ const HTML_CLASS_NAME_INVALID = `${HTML_CLASS_NAME}-invalid`;
 const HTML_CLASS_NAME_PROCESSED = `${HTML_CLASS_NAME}-processed`;
 const HTML_CLASS_NAME_PROCESSING = `${HTML_CLASS_NAME}-processing`;
 const REGEX_DATE_FORMAT = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?:#(?<which>\d))?$/;
-const API_BASE = 'https://kglw.net/api/v1';
+const API_BASE = 'https://kglw.net/api/v2';
 
 function log(...msgs) {
   console.trace('%cKGLW', 'color:chartreuse;background:black;padding:0.5rem;border-radius:1rem', ...msgs)
