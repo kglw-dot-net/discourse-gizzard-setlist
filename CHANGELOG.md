@@ -27,5 +27,6 @@ n/a
 
 MVP release.
 
-[0.2.0]: https://github.com/kglw-dot-net/discourse-plugin-gizzard-setlist/commit/56c3c810294ed78431f684c510302257a7ebbe37
+[0.2.1]: https://github.com/kglw-dot-net/discourse-plugin-gizzard-setlist/releases/tag/v0.2.1
+[0.2.0]: https://github.com/kglw-dot-net/discourse-plugin-gizzard-setlist/releases/tag/v0.2.0
 [Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.2.1...HEAD
