@@ -13,10 +13,6 @@ const HTML_CLASS_NAME_PROCESSING = `${HTML_CLASS_NAME}-processing`;
 const REGEX_DATE_FORMAT = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?:#(?<which>\d))?$/;
 const API_BASE = 'https://kglw.net/api/v2';
 
-function log(...msgs) {
-  console.trace('%cKGLW', 'color:chartreuse;background:black;padding:0.5rem;border-radius:1rem', ...msgs)
-}
-
 function hasTouchCapabilities() {
   // https://github.com/discourse/discourse/blob/8e63244e72f/app/assets/javascripts/discourse/app/lib/d-tooltip.js#L7C1-L9C2
   return navigator.maxTouchPoints > 1 || 'ontouchstart' in window;
@@ -44,7 +40,6 @@ async function doTheSetlist(setlistElement) {
       obj[setnumber][position] = songname + transition;
       return obj;
     }, {})
-    // log('setlist stuff...', {setlistData, setlistObject, permalink});
     const setlist = Object.entries(setlistObject).reduce((setlistStr,[whichSet,tracksArr])=>{
       if (tracksArr) return setlistStr + `<br/><b>${whichSet === 'e' ? 'Encore' : `Set ${whichSet}`}:</b> ` + tracksArr.join('');
       return setlistStr;
@@ -85,7 +80,6 @@ export function initializeSetlistCode(api) {
 
   // convert (inline) nodes back to bbcode
   addTagDecorateCallback(function (text) {
-    // log('addTagDecorateCallback', text, this.element);
     if ([...this.element.classList].includes(HTML_CLASS_NAME)) {
       this.prefix = '[setlist]';
       this.suffix = '[/setlist]';
@@ -94,7 +88,6 @@ export function initializeSetlistCode(api) {
 
   // convert (block) nodes back to bbcode
   addBlockDecorateCallback(function (text) {
-    // log('addBlockDecorateCallback', text, this.element);
     if (this.element.name === 'div' && [...this.element.classList].includes(HTML_CLASS_NAME)) {
       this.prefix = '[setlist]';
       this.suffix = '[/setlist]';
@@ -106,7 +99,6 @@ export function initializeSetlistCode(api) {
   // https://github.com/discourse/discourse/blob/1526d1f97d46/app/assets/javascripts/discourse/app/lib/plugin-api.js#L369
   api.decorateCookedElement(function(cookedElement) {
     cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`).forEach((setlistElem) => {
-      // log('decorateCookedElement...', setlistElem);
       setlistElem.classList.add(HTML_CLASS_NAME);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
         const removeListeners = (elem) => {
