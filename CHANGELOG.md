@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 n/a
 
 
+## [0.2.2] 2023-10-31
+
+### Updated
+
+* Rename the imported `tippy` function.
+
+
 ## [0.2.1] 2023-10-22
 
 ### Added
@@ -27,6 +34,8 @@ n/a
 
 MVP release.
 
+
+[0.2.2]: https://github.com/kglw-dot-net/discourse-plugin-gizzard-setlist/releases/tag/v0.2.2
 [0.2.1]: https://github.com/kglw-dot-net/discourse-plugin-gizzard-setlist/releases/tag/v0.2.1
 [0.2.0]: https://github.com/kglw-dot-net/discourse-plugin-gizzard-setlist/releases/tag/v0.2.0
 [Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.2.1...HEAD

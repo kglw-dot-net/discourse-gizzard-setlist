@@ -1,4 +1,4 @@
-import tippy from 'tippy.js';
+import tippy as kglwTippy from 'tippy.js';
 
 import { withPluginApi } from 'discourse/lib/plugin-api';
 import ComposerController from 'discourse/controllers/composer';
@@ -49,7 +49,7 @@ async function doTheSetlist(setlistElement) {
       if (tracksArr) return setlistStr + `<br/><b>${whichSet === 'e' ? 'Encore' : `Set ${whichSet}`}:</b> ` + tracksArr.join('');
       return setlistStr;
     }, '')
-    tippy(setlistElement, {
+    kglwTippy(setlistElement, {
       content: `<a href="https://kglw.net/setlists/${permalink}" target="_blank" rel="noopener">${showdate} @ ${venuename} (${city}, ${state || country})</a>${setlist}`,
       placement: 'top-start',
       duration: 0,
