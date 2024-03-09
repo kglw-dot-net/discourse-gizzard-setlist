@@ -4,5 +4,5 @@
 # authors: KGLW.net, Axe <alxndr+kglw-setlist-plugin@gmail.com>
 # url: https://github.com/kglw-dot-net/discourse-plugin-gizzard-setlist
 
-enabled_site_setting :kglwSetlist_enabled
+enabled_site_setting :kglwSetlist_enabled # setting name matches field in kglw-setlist.js
 register_asset 'stylesheets/discourse_kglwSetlist.scss'

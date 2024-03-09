@@ -1,4 +1,4 @@
-import tippy from 'tippy.js';
+import tippy from 'https://unpkg.com/tippy.js@6'; // WIP...
 
 import { withPluginApi } from 'discourse/lib/plugin-api';
 import ComposerController from 'discourse/controllers/composer';
@@ -6,6 +6,8 @@ import { addBlockDecorateCallback, addTagDecorateCallback } from 'discourse/lib/
 
 const PLUGIN_NAME = 'setlist'; // TBD Does this have to match the filename?
 const HTML_CLASS_NAME = 'kglwSetlist';
+const HTML_CLASS_NAME_DECORATED = `${HTML_CLASS_NAME}-decorated`;
+const HTML_CLASS_NAME_DECORATING = `${HTML_CLASS_NAME}-decorating`;
 const HTML_CLASS_NAME_ERROR = `${HTML_CLASS_NAME}-error`;
 const HTML_CLASS_NAME_INVALID = `${HTML_CLASS_NAME}-invalid`;
 const HTML_CLASS_NAME_PROCESSED = `${HTML_CLASS_NAME}-processed`;
@@ -13,12 +15,18 @@ const HTML_CLASS_NAME_PROCESSING = `${HTML_CLASS_NAME}-processing`;
 const REGEX_DATE_FORMAT = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?:#(?<which>\d))?$/;
 const API_BASE = 'https://kglw.net/api/v2';
 
+/*
+ * The backend stores post data as html: 'check out <span class="kglwSetlist">2023/10/07</span> it was fun'
+ * The Editor interface has had a new BBCode button added to support converting `<span class="kglwSetlist">...</span>` => `[setlist]...[/setlist]` in editor, and vice versa (other JS file)
+ * This file configures some markdown treatments, including converting `<span class="kglwSetlist">...</span>` => `[setlist]...[/setlist]`; and controls how `<span class="kglwSetlist">2023/10/07</span>` is rendered in a browser to viewers — e.g. requesting data and building an interactive component using Tippy
+ */
+
 function hasTouchCapabilities() {
   // https://github.com/discourse/discourse/blob/8e63244e72f/app/assets/javascripts/discourse/app/lib/d-tooltip.js#L7C1-L9C2
   return navigator.maxTouchPoints > 1 || 'ontouchstart' in window;
 }
 
-async function doTheSetlist(setlistElement) {
+async function buildInteractiveSetlistComponent(setlistElement) {
   if (!fetch)
     return console.error('no fetch...');
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSING);
@@ -63,8 +71,12 @@ async function doTheSetlist(setlistElement) {
 }
 
 export function initializeSetlistCode(api) {
-  // add button to Editing Content menu (...?)
-  api.addToolbarPopupMenuOptionsCallback(() => ({ action: 'insertSetlist', icon: 'list', label: 'setlist.title' }));
+  // add button to Editing Content menu (...?) e.g. when you highlight a word in the Discourse editor
+  api.addToolbarPopupMenuOptionsCallback(() => ({
+    action: 'insertSetlist',
+    icon: 'list',
+    label: 'setlist.title'
+  }));
   ComposerController.reopen({
     actions: {
       insertSetlist() { // matches action prop passed to addToolbarPopupMenuOptionsCallback
@@ -95,11 +107,12 @@ export function initializeSetlistCode(api) {
     }
   });
 
-  // decorate "cooked" content (after it's been rendered)
+  // client-side behavior, after HTML has been rendered
   // https://github.com/discourse/discourse/blob/1526d1f97d46/app/assets/javascripts/discourse/app/lib/plugin-api.js#L369
   api.decorateCookedElement(function(cookedElement) {
     cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`).forEach((setlistElem) => {
-      setlistElem.classList.add(HTML_CLASS_NAME);
+      setlistElem.classList.add(HTML_CLASS_NAME_DECORATING);
+      console.info('handling setlistElem', setlistElem);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
         const removeListeners = (elem) => {
           elem.removeEventListener('click', clickHandler);
@@ -107,12 +120,12 @@ export function initializeSetlistCode(api) {
         };
         const clickHandler = () => {
           removeListeners(setlistElem);
-          doTheSetlist(setlistElem);
+          buildInteractiveSetlistComponent(setlistElem);
         };
         const keydownHandler = ({key}) => {
           if (key === 'Enter') {
             removeListeners(setlistElem);
-            doTheSetlist(setlistElem);
+            buildInteractiveSetlistComponent(setlistElem);
           }
         };
         setlistElem.addEventListener('click', clickHandler);
@@ -120,6 +133,8 @@ export function initializeSetlistCode(api) {
       } else {
         setlistElem.classList.add(HTML_CLASS_NAME_INVALID)
       }
+      setlistElem.classList.remove(HTML_CLASS_NAME_DECORATING);
+      setlistElem.classList.add(HTML_CLASS_NAME_DECORATED);
     });
   }, {
     afterAdopt: true, // decorate html content after it is adopted by the main `document` (not in a detached DOM)
