@@ -1,5 +1,4 @@
-import tippy from 'https://unpkg.com/tippy.js@6'; // WIP...
-
+import loadScript from 'discourse/lib/load-script';
 import { withPluginApi } from 'discourse/lib/plugin-api';
 import ComposerController from 'discourse/controllers/composer';
 import { addBlockDecorateCallback, addTagDecorateCallback } from 'discourse/lib/to-markdown';
@@ -52,7 +51,8 @@ async function buildInteractiveSetlistComponent(setlistElement) {
       if (tracksArr) return setlistStr + `<br/><b>${whichSet === 'e' ? 'Encore' : `Set ${whichSet}`}:</b> ` + tracksArr.join('');
       return setlistStr;
     }, '')
-    tippy(setlistElement, {
+    await loadScript('https://unpkg.com/tippy.js@6');
+    window.tippy && window.tippy(setlistElement, {
       content: `<a href="https://kglw.net/setlists/${permalink}" target="_blank" rel="noopener">${showdate} @ ${venuename} (${city}, ${state || country})</a>${setlist}`,
       placement: 'top-start',
       duration: 0,
