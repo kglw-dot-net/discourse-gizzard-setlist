@@ -28,8 +28,10 @@ function hasTouchCapabilities() {
 async function buildInteractiveSetlistComponent(setlistElement) {
   if (!fetch)
     return console.error('no fetch...');
-  await loadScript('https://unpkg.com/tippy.js@6');
-  await loadScript('https://unpkg.com/popper.js@1'); // dependency of Tippy.js
+  await Promise.all([
+    loadScript('https://unpkg.com/popper.js@1'), // dependency of Tippy.js
+    loadScript('https://unpkg.com/tippy.js@5'), // note using v5, not latest v6
+  ]);
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSING);
   const matches = setlistElement.innerHTML.match(REGEX_DATE_FORMAT);
   if (matches.length !== 5)
@@ -38,9 +40,16 @@ async function buildInteractiveSetlistComponent(setlistElement) {
     const {year, month, day, which = 1} = matches.groups // note, these are all strings...
     const whichNum = Number(which)
     const date = `${year}-${month}-${day}`
-    // TODO parallel-ize these requests
-    const {showdate, venuename, city, state, country, permalink} = (await (await fetch(`${API_BASE}/shows/showdate/${date}.json`)).json()).data[whichNum - 1]; // `-1` bc arrays are 0-indexed...
-    const setlistData = (await (await fetch(`${API_BASE}/setlists/showdate/${date}.json`)).json()).data;
+    const [p1, p2] = await Promise.all([
+      fetch(`${API_BASE}/shows/showdate/${date}.json`),
+      fetch(`${API_BASE}/setlists/showdate/${date}.json`)
+    ]);
+    const [d1, d2] = await Promise.all([
+      p1.json(),
+      p2.json()
+    ])
+    const [{showdate, venuename, city, state, country, permalink}] = d1.data[whichNum - 1]; // `-1` bc arrays are 0-indexed but "whichNum" is not
+    const setlistData = d2.data;
     const setlistObject = setlistData.reduce((obj,{showorder, setnumber, position, songname, transition},idx)=>{
       if (showorder !== whichNum)
         return obj;
@@ -53,7 +62,7 @@ async function buildInteractiveSetlistComponent(setlistElement) {
       if (tracksArr) return setlistStr + `<br/><b>${whichSet === 'e' ? 'Encore' : `Set ${whichSet}`}:</b> ` + tracksArr.join('');
       return setlistStr;
     }, '')
-    window.tippy && window.tippy(setlistElement, {
+    window.tippy && window.Popper && window.tippy(setlistElement, {
       content: `<a href="https://kglw.net/setlists/${permalink}" target="_blank" rel="noopener">${showdate} @ ${venuename} (${city}, ${state || country})</a>${setlist}`,
       placement: 'top-start',
       duration: 0,
@@ -61,7 +70,7 @@ async function buildInteractiveSetlistComponent(setlistElement) {
       interactive: true,
       trigger: hasTouchCapabilities() ? 'click' : 'mouseenter',
       allowHTML: true,
-    }).show() || console.debug('[kglwSetlist] tippy not found?', {tippy: window.tippy, popper: window.Popper, setlistElement, setlistData});
+    }).show() || console.debug('[kglwSetlist] tippy/Popper not found?', {tippy: window.tippy, popper: window.Popper, setlistElement, setlistData});
     setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
   } catch (error) {
     setlistElement.classList.add(HTML_CLASS_NAME_ERROR);
