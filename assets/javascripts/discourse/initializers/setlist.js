@@ -48,7 +48,7 @@ async function buildInteractiveSetlistComponent(setlistElement) {
       p1.json(),
       p2.json()
     ])
-    const [{showdate, venuename, city, state, country, permalink}] = d1.data[whichNum - 1]; // `-1` bc arrays are 0-indexed but "whichNum" is not
+    const {showdate, venuename, city, state, country, permalink} = d1.data[whichNum - 1]; // `-1` bc arrays are 0-indexed but "whichNum" is not
     const setlistData = d2.data;
     const setlistObject = setlistData.reduce((obj,{showorder, setnumber, position, songname, transition},idx)=>{
       if (showorder !== whichNum)
