@@ -113,7 +113,6 @@ export function initializeSetlistCode(api) {
   api.decorateCookedElement(function(cookedElement) {
     cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`).forEach((setlistElem) => {
       setlistElem.classList.add(HTML_CLASS_NAME_DECORATING);
-      console.info('handling setlistElem', setlistElem);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
         const removeListeners = (elem) => {
           elem.removeEventListener('click', clickHandler);
