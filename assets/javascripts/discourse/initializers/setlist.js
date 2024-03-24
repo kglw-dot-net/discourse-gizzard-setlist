@@ -28,6 +28,8 @@ function hasTouchCapabilities() {
 async function buildInteractiveSetlistComponent(setlistElement) {
   if (!fetch)
     return console.error('no fetch...');
+  await loadScript('https://unpkg.com/tippy.js@6');
+  await loadScript('https://unpkg.com/popper.js@1'); // dependency of Tippy.js
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSING);
   const matches = setlistElement.innerHTML.match(REGEX_DATE_FORMAT);
   if (matches.length !== 5)
@@ -51,7 +53,6 @@ async function buildInteractiveSetlistComponent(setlistElement) {
       if (tracksArr) return setlistStr + `<br/><b>${whichSet === 'e' ? 'Encore' : `Set ${whichSet}`}:</b> ` + tracksArr.join('');
       return setlistStr;
     }, '')
-    await loadScript('https://unpkg.com/tippy.js@6');
     window.tippy && window.tippy(setlistElement, {
       content: `<a href="https://kglw.net/setlists/${permalink}" target="_blank" rel="noopener">${showdate} @ ${venuename} (${city}, ${state || country})</a>${setlist}`,
       placement: 'top-start',
@@ -60,7 +61,7 @@ async function buildInteractiveSetlistComponent(setlistElement) {
       interactive: true,
       trigger: hasTouchCapabilities() ? 'click' : 'mouseenter',
       allowHTML: true,
-    }).show();
+    }).show() || console.debug('[kglwSetlist] tippy not found?', {tippy: window.tippy, popper: window.Popper, setlistElement, setlistData});
     setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
   } catch (error) {
     setlistElement.classList.add(HTML_CLASS_NAME_ERROR);
