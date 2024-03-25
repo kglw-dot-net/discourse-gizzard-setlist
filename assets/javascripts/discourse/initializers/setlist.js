@@ -81,15 +81,10 @@ async function buildInteractiveSetlistComponent(setlistElement) {
 }
 
 export function initializeSetlistCode(api) {
-  // add button to Editing Content menu (...?) e.g. when you highlight a word in the Discourse editor
-  api.addToolbarPopupMenuOptionsCallback(() => ({
-    action: 'insertSetlist',
-    icon: 'list',
-    label: 'setlist.title'
-  }));
+  // add button to toolbar above the editing toolbar (editor button bar)
   ComposerController.reopen({
     actions: {
-      insertSetlist() { // matches action prop passed to addToolbarPopupMenuOptionsCallback
+      insertSetlist() {
         this.get('toolbarEvent').applySurround(
           '[setlist]',
           '[/setlist]',
