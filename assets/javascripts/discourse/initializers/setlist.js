@@ -123,21 +123,21 @@ export function initializeSetlistCode(api) {
       setlistElem.classList.add(HTML_CLASS_NAME_DECORATING);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
         const removeListeners = (elem) => {
-          elem.removeEventListener(trigger, mouseHandler);
-          elem.removeEventListener('keydown', keydownHandler);
+          elem.removeEventListener(trigger, pointerHandler);
+          elem.removeEventListener('keydown', keyboardHandler);
         };
-        const mouseHandler = () => {
+        const pointerHandler = () => {
           removeListeners(setlistElem);
           buildInteractiveSetlistComponent(setlistElem);
         };
-        const keydownHandler = ({key}) => {
+        const keyboardHandler = ({key}) => {
           if (key === 'Enter') {
             removeListeners(setlistElem);
             buildInteractiveSetlistComponent(setlistElem);
           }
         };
         setlistElem.addEventListener(trigger, mouseHandler);
-        setlistElem.addEventListener('keydown', keydownHandler);
+        setlistElem.addEventListener('keydown', keyboardHandler);
       } else {
         setlistElem.classList.add(HTML_CLASS_NAME_INVALID)
       }
