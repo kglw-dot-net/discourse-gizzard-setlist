@@ -20,18 +20,13 @@ const API_BASE = 'https://kglw.net/api/v2';
  * This file configures some markdown treatments, including converting `<span class="kglwSetlist">...</span>` => `[setlist]...[/setlist]`; and controls how `<span class="kglwSetlist">2023/10/07</span>` is rendered in a browser to viewers — e.g. requesting data and building an interactive component using Tippy
  */
 
-function hasTouchCapabilities() {
-  // https://github.com/discourse/discourse/blob/8e63244e72f/app/assets/javascripts/discourse/app/lib/d-tooltip.js#L7C1-L9C2
-  return navigator.maxTouchPoints > 1 || 'ontouchstart' in window;
-}
+const trigger = (navigator.maxTouchPoints > 1 || 'ontouchstart' in window) // https://github.com/discourse/discourse/blob/8e63244e72f/app/assets/javascripts/discourse/app/lib/d-tooltip.js#L7C1-L9C2
+  ? 'click'
+  : 'hover';
 
 async function buildInteractiveSetlistComponent(setlistElement) {
   if (!fetch)
     return console.error('no fetch...');
-  await Promise.all([
-    loadScript('https://unpkg.com/popper.js@1'), // dependency of Tippy.js
-    loadScript('https://unpkg.com/tippy.js@5'), // note using v5, not latest v6
-  ]);
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSING);
   const matches = setlistElement.innerHTML.match(REGEX_DATE_FORMAT);
   if (matches.length !== 5)
@@ -62,15 +57,24 @@ async function buildInteractiveSetlistComponent(setlistElement) {
       if (tracksArr) return setlistStr + `<br/><b>${whichSet === 'e' ? 'Encore' : `Set ${whichSet}`}:</b> ` + tracksArr.join('');
       return setlistStr;
     }, '')
-    window.tippy && window.Popper && window.tippy(setlistElement, {
-      content: `<a href="https://kglw.net/setlists/${permalink}" target="_blank" rel="noopener">${showdate} @ ${venuename} (${city}, ${state || country})</a>${setlist}`,
-      placement: 'top-start',
-      duration: 0,
-      theme: 'translucent',
-      interactive: true,
-      trigger: hasTouchCapabilities() ? 'click' : 'mouseenter',
-      allowHTML: true,
-    }).show() || console.debug('[kglwSetlist] tippy/Popper not found?', {tippy: window.tippy, popper: window.Popper, setlistElement, setlistData});
+    if (window.Popper && window.tippy) {
+      window.tippy(setlistElement, {
+        content: `<a href="https://kglw.net/setlists/${permalink}" target="_blank" rel="noopener">${showdate} @ ${venuename} (${city}, ${state || country})</a>${setlist}`,
+        placement: 'top-start',
+        duration: 0,
+        theme: 'translucent',
+        interactive: true,
+        trigger: 'click',
+        allowHTML: true,
+      }).show();
+    } else {
+      console.debug('[kglwSetlist] tippy/Popper not found?', {
+        tippy: window.tippy,
+        Popper: window.Popper,
+        setlistElement,
+        setlistData
+      });
+    }
     setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
   } catch (error) {
     setlistElement.classList.add(HTML_CLASS_NAME_ERROR);
@@ -119,21 +123,21 @@ export function initializeSetlistCode(api) {
       setlistElem.classList.add(HTML_CLASS_NAME_DECORATING);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
         const removeListeners = (elem) => {
-          elem.removeEventListener('click', clickHandler);
-          elem.removeEventListener('keydown', keydownHandler);
+          elem.removeEventListener(trigger, pointerHandler);
+          elem.removeEventListener('keydown', keyboardHandler);
         };
-        const clickHandler = () => {
+        const pointerHandler = () => {
           removeListeners(setlistElem);
           buildInteractiveSetlistComponent(setlistElem);
         };
-        const keydownHandler = ({key}) => {
+        const keyboardHandler = ({key}) => {
           if (key === 'Enter') {
             removeListeners(setlistElem);
             buildInteractiveSetlistComponent(setlistElem);
           }
         };
-        setlistElem.addEventListener('click', clickHandler);
-        setlistElem.addEventListener('keydown', keydownHandler);
+        setlistElem.addEventListener(trigger, mouseHandler);
+        setlistElem.addEventListener('keydown', keyboardHandler);
       } else {
         setlistElem.classList.add(HTML_CLASS_NAME_INVALID)
       }
@@ -144,6 +148,13 @@ export function initializeSetlistCode(api) {
     afterAdopt: true, // decorate html content after it is adopted by the main `document` (not in a detached DOM)
     id: HTML_CLASS_NAME,
   });
+
+  // load scripts
+  const [s1, s2] = await Promise.all([
+    loadScript('https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js'), // dependency of Tippy.js
+    loadScript('https://unpkg.com/tippy.js@5.2.1/dist/tippy-bundle.iife.min.js'), // note using v5, not latest v6
+  ]);
+  global.console.debug('scripts...', {s1, s2});
 }
 
 export default {
