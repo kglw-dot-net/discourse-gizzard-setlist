@@ -20,10 +20,9 @@ const API_BASE = 'https://kglw.net/api/v2';
  * This file configures some markdown treatments, including converting `<span class="kglwSetlist">...</span>` => `[setlist]...[/setlist]`; and controls how `<span class="kglwSetlist">2023/10/07</span>` is rendered in a browser to viewers — e.g. requesting data and building an interactive component using Tippy
  */
 
-function hasTouchCapabilities() {
-  // https://github.com/discourse/discourse/blob/8e63244e72f/app/assets/javascripts/discourse/app/lib/d-tooltip.js#L7C1-L9C2
-  return navigator.maxTouchPoints > 1 || 'ontouchstart' in window;
-}
+const trigger = (navigator.maxTouchPoints > 1 || 'ontouchstart' in window) // https://github.com/discourse/discourse/blob/8e63244e72f/app/assets/javascripts/discourse/app/lib/d-tooltip.js#L7C1-L9C2
+  ? 'click'
+  : 'mouseenter';
 
 async function buildInteractiveSetlistComponent(setlistElement) {
   if (!fetch)
@@ -62,15 +61,24 @@ async function buildInteractiveSetlistComponent(setlistElement) {
       if (tracksArr) return setlistStr + `<br/><b>${whichSet === 'e' ? 'Encore' : `Set ${whichSet}`}:</b> ` + tracksArr.join('');
       return setlistStr;
     }, '')
-    window.tippy && window.Popper && window.tippy(setlistElement, {
-      content: `<a href="https://kglw.net/setlists/${permalink}" target="_blank" rel="noopener">${showdate} @ ${venuename} (${city}, ${state || country})</a>${setlist}`,
-      placement: 'top-start',
-      duration: 0,
-      theme: 'translucent',
-      interactive: true,
-      trigger: hasTouchCapabilities() ? 'click' : 'mouseenter',
-      allowHTML: true,
-    }).show() || console.debug('[kglwSetlist] tippy/Popper not found?', {tippy: window.tippy, popper: window.Popper, setlistElement, setlistData});
+    if (window.Popper && window.tippy) {
+      window.tippy(setlistElement, {
+        content: `<a href="https://kglw.net/setlists/${permalink}" target="_blank" rel="noopener">${showdate} @ ${venuename} (${city}, ${state || country})</a>${setlist}`,
+        placement: 'top-start',
+        duration: 0,
+        theme: 'translucent',
+        interactive: true,
+        trigger,
+        allowHTML: true,
+      }).show();
+    } else {
+      console.debug('[kglwSetlist] tippy/Popper not found?', {
+        tippy: window.tippy,
+        Popper: window.Popper,
+        setlistElement,
+        setlistData
+      });
+    }
     setlistElement.classList.add(HTML_CLASS_NAME_PROCESSED);
   } catch (error) {
     setlistElement.classList.add(HTML_CLASS_NAME_ERROR);
