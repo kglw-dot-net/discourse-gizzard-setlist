@@ -5,7 +5,7 @@
   margin: 0 -1px;
   cursor: pointer;
 }
-.kglwSetlist:not(.kglw-processed):hover {
+.kglwSetlist:not(.kglwSetlist-processed):hover {
   box-shadow: 0px 0px 2px 3px #0E09;
 }
 
@@ -27,4 +27,5 @@
 .kglwSetlist-processed {
   border-color: #00Ea;
   cursor: context-menu;
+  box-shadow: 0 0 0.1em 0.1em purple inset
 }
