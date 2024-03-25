@@ -27,11 +27,12 @@ const trigger = (navigator.maxTouchPoints > 1 || 'ontouchstart' in window) // ht
 async function buildInteractiveSetlistComponent(setlistElement) {
   if (!fetch)
     return console.error('no fetch...');
-  await Promise.all([
-    loadScript('https://unpkg.com/popper.js@1'), // dependency of Tippy.js
-    loadScript('https://unpkg.com/tippy.js@5'), // note using v5, not latest v6
-  ]);
   setlistElement.classList.add(HTML_CLASS_NAME_PROCESSING);
+  const [s1, s2] = await Promise.all([
+    loadScript('https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js'), // dependency of Tippy.js
+    loadScript('https://unpkg.com/tippy.js@5.2.1/dist/tippy-bundle.iife.min.js'), // note using v5, not latest v6
+  ]);
+  global.console.debug('scripts...', {s1, s2});
   const matches = setlistElement.innerHTML.match(REGEX_DATE_FORMAT);
   if (matches.length !== 5)
     return console.error('regex match does not look right', setlistElement.innerHTML, REGEX_DATE_FORMAT);
