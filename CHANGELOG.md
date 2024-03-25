@@ -13,6 +13,7 @@ Debbuging WIP...
 ### Updated
 
 * UX: modified triggers (hover to load, click to show)
+* core: load dependency scripts eagerly
 
 
 ## ~~[0.2.2]~~ 2023-10-31
