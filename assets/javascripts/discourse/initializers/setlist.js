@@ -22,7 +22,7 @@ const API_BASE = 'https://kglw.net/api/v2';
 
 const trigger = (navigator.maxTouchPoints > 1 || 'ontouchstart' in window) // https://github.com/discourse/discourse/blob/8e63244e72f/app/assets/javascripts/discourse/app/lib/d-tooltip.js#L7C1-L9C2
   ? 'click'
-  : 'mouseenter';
+  : 'hover';
 
 async function buildInteractiveSetlistComponent(setlistElement) {
   if (!fetch)
@@ -69,7 +69,7 @@ async function buildInteractiveSetlistComponent(setlistElement) {
         duration: 0,
         theme: 'translucent',
         interactive: true,
-        trigger,
+        trigger: 'click',
         allowHTML: true,
       }).show();
     } else {
@@ -128,10 +128,10 @@ export function initializeSetlistCode(api) {
       setlistElem.classList.add(HTML_CLASS_NAME_DECORATING);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
         const removeListeners = (elem) => {
-          elem.removeEventListener('click', clickHandler);
+          elem.removeEventListener(trigger, mouseHandler);
           elem.removeEventListener('keydown', keydownHandler);
         };
-        const clickHandler = () => {
+        const mouseHandler = () => {
           removeListeners(setlistElem);
           buildInteractiveSetlistComponent(setlistElem);
         };
@@ -141,7 +141,7 @@ export function initializeSetlistCode(api) {
             buildInteractiveSetlistComponent(setlistElem);
           }
         };
-        setlistElem.addEventListener('click', clickHandler);
+        setlistElem.addEventListener(trigger, mouseHandler);
         setlistElem.addEventListener('keydown', keydownHandler);
       } else {
         setlistElem.classList.add(HTML_CLASS_NAME_INVALID)
