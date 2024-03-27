@@ -13,6 +13,7 @@ Debbuging WIP...
 ### Updated
 
 * UX: modified triggers (hover to load, click to show)
+* style: purple for processed
 * core: load dependency scripts eagerly
 
 
