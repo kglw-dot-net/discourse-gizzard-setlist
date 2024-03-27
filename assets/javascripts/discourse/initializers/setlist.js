@@ -74,7 +74,7 @@ async function buildInteractiveSetlistComponent(setlistElement) {
             console.debug('[kglwSetlist] onShow: no Popper...');
             return false;
           }
-        },
+        }
       }).show();
     } else {
       console.debug('[kglwSetlist] tippy/Popper not found?', {
@@ -162,7 +162,7 @@ export function initializeSetlistCode(api) {
   // TODO only load if there's a setlist on the page...
   const [s1, s2] = await Promise.all([
     loadScript('https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js'), // dependency of Tippy.js
-    loadScript('https://unpkg.com/tippy.js@5.2.1/dist/tippy-bundle.iife.min.js'), // note using v5, not latest v6
+    loadScript('https://unpkg.com/tippy.js@5.2.1/dist/tippy-bundle.iife.min.js') // note using v5, not latest v6
   ]);
   global.console.debug('scripts...', {s1, s2});
 }
