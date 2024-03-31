@@ -145,7 +145,7 @@ export async function initializeSetlistCode(api) {
             buildInteractiveSetlistComponent(setlistElem);
           }
         };
-        setlistElem.addEventListener(trigger, mouseHandler);
+        setlistElem.addEventListener(trigger, pointerHandler);
         setlistElem.addEventListener('keydown', keyboardHandler);
       } else {
         setlistElem.classList.add(HTML_CLASS_NAME_INVALID)
@@ -160,7 +160,7 @@ export async function initializeSetlistCode(api) {
 
   // load 3rd-party dependency scripts... TODO only load if there's a setlist on the page
   await 'https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js'; // dependency of Tippy.js
-  // explicitly waiting for Popper to load before starting the request for tippy, because it will immediately-invoke and expect to find `window.Popper`
+  // explicitly waiting for Popper to load before starting the request for tippy, because tippy will immediately-invoke and expect to find `window.Popper`
   await 'https://unpkg.com/tippy.js@5.2.1/dist/tippy-bundle.iife.min.js'; // note using v5, not latest v6
 }
 
