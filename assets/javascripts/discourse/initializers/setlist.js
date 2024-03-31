@@ -113,10 +113,9 @@ export async function initializeSetlistCode(api) {
 
   // client-side behavior, after HTML has been rendered
   // https://github.com/discourse/discourse/blob/1526d1f97d46/app/assets/javascripts/discourse/app/lib/plugin-api.js#L369
-  let isSetlistInContent = false;
   api.decorateCookedElement(function(cookedElement) {
-    cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`).forEach((setlistElem) => {
-      isSetlistInContent ||= true;
+    const setlistElems = cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`);
+    setlistElems.forEach((setlistElem) => {
       setlistElem.classList.add(HTML_CLASS_NAME_DECORATING);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
         const removeListeners = (elem) => {
@@ -141,16 +140,15 @@ export async function initializeSetlistCode(api) {
       setlistElem.classList.remove(HTML_CLASS_NAME_DECORATING);
       setlistElem.classList.add(HTML_CLASS_NAME_DECORATED);
     });
+    if (!!setlistElems.length) { // load 3rd-party dependency scripts
+      await loadScript('https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js');
+      // explicitly letting Popper finish before starting the request for tippy, because tippy will immediately-invoke and expect to find `window.Popper`
+      await fetch('https://unpkg.com/tippy.js@5.2.1/dist/tippy-bundle.iife.min.js'); // note using v5, not latest v6
+    }
   }, {
     afterAdopt: true, // decorate html content after it is adopted by the main `document` (not in a detached DOM)
     id: HTML_CLASS_NAME,
   });
-  if (isSetlistInContent) { // load 3rd-party dependency scripts
-    await fetch('https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js').then(async () => {
-      // explicitly letting Popper finish before starting the request for tippy, because tippy will immediately-invoke and expect to find `window.Popper`
-      await fetch('https://unpkg.com/tippy.js@5.2.1/dist/tippy-bundle.iife.min.js'); // note using v5, not latest v6
-    });
-  }
 }
 
 export default {
