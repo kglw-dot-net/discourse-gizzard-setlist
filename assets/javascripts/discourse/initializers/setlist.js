@@ -20,10 +20,6 @@ const API_BASE = 'https://kglw.net/api/v2';
  * This file configures some markdown treatments, including converting `<span class="kglwSetlist">...</span>` => `[setlist]...[/setlist]`; and controls how `<span class="kglwSetlist">2023/10/07</span>` is rendered in a browser to viewers — e.g. requesting data and building an interactive component using Tippy
  */
 
-const trigger = (navigator.maxTouchPoints > 1 || 'ontouchstart' in window) // https://github.com/discourse/discourse/blob/8e63244e72f/app/assets/javascripts/discourse/app/lib/d-tooltip.js#L7C1-L9C2
-  ? 'click'
-  : 'hover';
-
 async function buildInteractiveSetlistComponent(setlistElement) {
   if (!fetch)
     return console.error('no fetch...');
@@ -132,7 +128,7 @@ export async function initializeSetlistCode(api) {
       setlistElem.classList.add(HTML_CLASS_NAME_DECORATING);
       if (REGEX_DATE_FORMAT.test(setlistElem.innerText)) {
         const removeListeners = (elem) => {
-          elem.removeEventListener(trigger, pointerHandler);
+          elem.removeEventListener('click', pointerHandler);
           elem.removeEventListener('keydown', keyboardHandler);
         };
         const pointerHandler = () => {
@@ -145,7 +141,7 @@ export async function initializeSetlistCode(api) {
             buildInteractiveSetlistComponent(setlistElem);
           }
         };
-        setlistElem.addEventListener(trigger, pointerHandler);
+        setlistElem.addEventListener('click', pointerHandler);
         setlistElem.addEventListener('keydown', keyboardHandler);
       } else {
         setlistElem.classList.add(HTML_CLASS_NAME_INVALID)
