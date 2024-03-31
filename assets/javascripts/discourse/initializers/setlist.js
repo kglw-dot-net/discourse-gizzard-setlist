@@ -158,13 +158,10 @@ export function initializeSetlistCode(api) {
     id: HTML_CLASS_NAME,
   });
 
-  // load scripts
-  // TODO only load if there's a setlist on the page...
-  const [s1, s2] = await Promise.all([
-    loadScript('https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js'), // dependency of Tippy.js
-    loadScript('https://unpkg.com/tippy.js@5.2.1/dist/tippy-bundle.iife.min.js') // note using v5, not latest v6
-  ]);
-  global.console.debug('scripts...', {s1, s2});
+  // load 3rd-party dependency scripts... TODO only load if there's a setlist on the page
+  await 'https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js'; // dependency of Tippy.js
+  // explicitly waiting for Popper to load before starting the request for tippy, because it will immediately-invoke and expect to find `window.Popper`
+  await 'https://unpkg.com/tippy.js@5.2.1/dist/tippy-bundle.iife.min.js'; // note using v5, not latest v6
 }
 
 export default {
