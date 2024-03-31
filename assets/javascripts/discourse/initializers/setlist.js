@@ -93,7 +93,7 @@ async function buildInteractiveSetlistComponent(setlistElement) {
   }
 }
 
-export function initializeSetlistCode(api) {
+export async function initializeSetlistCode(api) {
   // add button to toolbar above the editing toolbar (editor button bar)
   ComposerController.reopen({
     actions: {
