@@ -13,8 +13,8 @@ Debbuging WIP...
 ### Updated
 
 * UX: modified triggers (hover to load, click to show)
-* style: purple for processed
-* core: load dependency scripts eagerly
+* style: purple for processed; no more linebreaks in the middle of a setlist
+* core: load dependency scripts eagerly but sequentially
 
 
 ## ~~[0.2.2]~~ 2023-10-31
