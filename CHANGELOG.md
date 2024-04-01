@@ -20,7 +20,7 @@ Debbuging WIP...
 ## ~~[0.2.2]~~ 2023-10-31
 
 🐛 This version is buggy — avoid it.
-[#1](https://github.com/kglw-dot-net/discourse-plugin-gizzard-setlist/issues/1)
+[#1](https://github.com/kglw-dot-net/discourse-gizzard-setlist/issues/1)
 
 ### Updated
 
@@ -44,7 +44,7 @@ Debbuging WIP...
 MVP release.
 
 
-[0.2.2]: https://github.com/kglw-dot-net/discourse-plugin-gizzard-setlist/releases/tag/v0.2.2
-[0.2.1]: https://github.com/kglw-dot-net/discourse-plugin-gizzard-setlist/releases/tag/v0.2.1
-[0.2.0]: https://github.com/kglw-dot-net/discourse-plugin-gizzard-setlist/releases/tag/v0.2.0
+[0.2.2]: https://github.com/kglw-dot-net/discourse-gizzard-setlist/releases/tag/v0.2.2
+[0.2.1]: https://github.com/kglw-dot-net/discourse-gizzard-setlist/releases/tag/v0.2.1
+[0.2.0]: https://github.com/kglw-dot-net/discourse-gizzard-setlist/releases/tag/v0.2.0
 [Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.2.1...HEAD
