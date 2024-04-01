@@ -79,7 +79,7 @@ async function buildInteractiveSetlistComponent(setlistElement) {
   }
 }
 
-export async function initializeSetlistCode(api) {
+export function initializeSetlistCode(api) {
   // add button to toolbar above the editing toolbar (editor button bar)
   ComposerController.reopen({
     actions: {
@@ -113,7 +113,7 @@ export async function initializeSetlistCode(api) {
 
   // client-side behavior, after HTML has been rendered
   // https://github.com/discourse/discourse/blob/1526d1f97d46/app/assets/javascripts/discourse/app/lib/plugin-api.js#L369
-  api.decorateCookedElement(function(cookedElement) {
+  api.decorateCookedElement(async function(cookedElement) {
     const setlistElems = cookedElement.querySelectorAll(`.${HTML_CLASS_NAME}`);
     setlistElems.forEach((setlistElem) => {
       setlistElem.classList.add(HTML_CLASS_NAME_DECORATING);
