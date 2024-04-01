@@ -143,7 +143,7 @@ export function initializeSetlistCode(api) {
     if (!!setlistElems.length) { // load 3rd-party dependency scripts
       await loadScript('https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js');
       // explicitly letting Popper finish before starting the request for tippy, because tippy will immediately-invoke and expect to find `window.Popper`
-      await fetch('https://unpkg.com/tippy.js@5.2.1/dist/tippy-bundle.iife.min.js'); // note using v5, not latest v6
+      await loadScript('https://unpkg.com/tippy.js@5.2.1/dist/tippy-bundle.iife.min.js'); // note using v5, not latest v6
     }
   }, {
     afterAdopt: true, // decorate html content after it is adopted by the main `document` (not in a detached DOM)
